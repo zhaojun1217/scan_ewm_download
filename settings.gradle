@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name='scan_ewm_download'

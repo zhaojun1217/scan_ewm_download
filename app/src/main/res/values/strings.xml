@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">扫易下</string>
+    <string name="app_need_this_permission">应用需要这些权限,才能流畅的使用</string>
+    <string name="order_dialog_confirm">确定</string>
+    <string name="order_dialog_dismiss">取消</string>
+</resources>
