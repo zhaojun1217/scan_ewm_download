@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
@@ -37,6 +38,9 @@ import com.google.zxing.qrcode.QRCodeReader;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
+import com.youth.banner.Banner;
+import com.youth.banner.loader.ImageLoader;
+import com.zhaoj.scan_ewm_download.base.BaseActivity;
 import com.zhaoj.scan_ewm_download.common.Constant;
 import com.zhaoj.scan_ewm_download.dialog.DialogUtil;
 import com.zhaoj.scan_ewm_download.download.DownLoadUtil;
@@ -46,6 +50,7 @@ import com.zhaoj.scan_ewm_download.utils.CreateBarcodeUtil;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.jpush.android.api.JPushInterface;
@@ -55,15 +60,19 @@ import gdut.bsx.share2.ShareContentType;
 import pub.devrel.easypermissions.AppSettingsDialog;
 import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+public class MainActivity extends BaseActivity implements EasyPermissions.PermissionCallbacks {
 
     private int REQUEST_CODE = 2333;
     private static final int RERMISSION_REQUESTCODE = 1;
-    private Button btnScan;
+    private Button btnScan, btnScanHistory;
     private ImageView imgScanRes;
     private TextView tvLongCheckText;
+    private Banner bannerEWM;
     private File fileByBitmap;
+
+
     protected String[] needPermission = {android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+    private ArrayList<String> imgStrs = new ArrayList<>();
 
     /**
      * 获取通知权限
@@ -99,19 +108,18 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected int getContentViewId() {
+        return R.layout.activity_main;
+    }
+
+
+    @Override
+    protected void initPage() {
+        super.initPage();
         ZXingLibrary.initDisplayOpinion(this);
-        DownLoadUtil.init(this);
+        DownLoadUtil.init(MainActivity.this);
         JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);   // 初始化 JPush
-
-        initView();
-
-        initEvent();
-
-
         boolean enabled = isNotificationEnabled(MainActivity.this);
 
         if (!enabled) {
@@ -144,10 +152,12 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             startActivity(localIntent);
         }
 
-
     }
 
-    private void initEvent() {
+    @Override
+    protected void initEvent() {
+        super.initEvent();
+
         /**
          * 打开默认二维码扫描界面
          */
@@ -204,17 +214,45 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
             }
         });
+
+        btnScanHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, ScanHistoryActivity.class));
+            }
+        });
     }
 
+
     private Uri getShareImageUrl() {
-//        MediaStore.Images.Media.insertImage(getContentResolver(),new Bitmap(),"","" );
         return FileUtil.getFileUri(MainActivity.this, ShareContentType.IMAGE, fileByBitmap);
     }
 
-    private void initView() {
+    @Override
+    protected void initView() {
+        super.initView();
         btnScan = findViewById(R.id.btnScan);
-        tvLongCheckText = findViewById(R.id.tvLongCheckText);
+        bannerEWM = findViewById(R.id.bannerEWM);
         imgScanRes = findViewById(R.id.imgScanRes);
+        btnScanHistory = findViewById(R.id.btnScanHistory);
+        tvLongCheckText = findViewById(R.id.tvLongCheckText);
+
+        initBanner();
+    }
+
+    private void initBanner() {
+
+        imgStrs.add("https://b-ssl.duitang.com/uploads/item/201208/30/20120830173930_PBfJE.jpeg");
+        imgStrs.add("https://b-ssl.duitang.com/uploads/item/201210/06/20121006121229_tPHfy.jpeg");
+        imgStrs.add("https://img.52z.com/upload/news/image/20180621/20180621055734_59936.jpg");
+        imgStrs.add("https://b-ssl.duitang.com/uploads/blog/201312/04/20131204184148_hhXUT.jpeg");
+
+        //设置图片加载器
+        bannerEWM.setImageLoader(new GlideImageLoader());
+        //设置图片集合
+        bannerEWM.setImages(imgStrs);
+        //banner设置方法全部调用完毕时最后调用
+        bannerEWM.start();
     }
 
     @Override
@@ -310,5 +348,38 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     .build()
                     .show();
         }
+
     }
+
+    public class GlideImageLoader extends ImageLoader {
+        @Override
+        public void displayImage(Context context, Object path, ImageView imageView) {
+            /**
+             注意：
+             1.图片加载器由自己选择，这里不限制，只是提供几种使用方法
+             2.返回的图片路径为Object类型，由于不能确定你到底使用的那种图片加载器，
+             传输的到的是什么格式，那么这种就使用Object接收和返回，你只需要强转成你传输的类型就行，
+             切记不要胡乱强转！
+             */
+
+            //Glide 加载图片简单用法
+            Glide.with(context).load(path).into(imageView);
+
+//            //Picasso 加载图片简单用法
+//            Picasso.with(context).load(path).into(imageView);
+
+            //用fresco加载图片简单用法，记得要写下面的createImageView方法
+            Uri uri = Uri.parse((String) path);
+            imageView.setImageURI(uri);
+        }
+
+        //提供createImageView 方法，如果不用可以不重写这个方法，主要是方便自定义ImageView的创建
+        @Override
+        public ImageView createImageView(Context context) {
+            //使用fresco，需要创建它提供的ImageView，当然你也可以用自己自定义的具有图片加载功能的ImageView
+            ImageView imageView = new ImageView(context);
+            return imageView;
+        }
+    }
+
 }

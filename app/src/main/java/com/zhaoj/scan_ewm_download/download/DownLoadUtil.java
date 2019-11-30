@@ -68,8 +68,12 @@ public class DownLoadUtil {
                 }
             }
         };
-        // 发现有新版本需要安装的时候,直接先清空装在apk的文件夹
-        clearTemp(mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+        // 发现有新版本需要安装的时候,直接先清空装在apk的文件夹 ,如果是第一次安装，防止找不到文件夹报错，try catch
+        try {
+            clearTemp(mContext.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+        } catch (Exception e) {
+
+        }
         DialogUtil.showDownloadDialog(mContext);
         new Thread(new DownLoadRunnable(mContext, downLoadUrl, handler)).start();
 

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao' // apply plugin
 
 android {
     signingConfigs {
@@ -26,9 +27,9 @@ android {
         }
 
         manifestPlaceholders = [
-                JPUSH_PKGNAME : "com.zhaoj.scan_ewm_download",
+                JPUSH_PKGNAME: "com.zhaoj.scan_ewm_download",
                 JPUSH_APPKEY : "f409b136d21cde22eff1371b", //JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+                JPUSH_CHANNEL: "developer-default", //暂时填写默认值即可.
         ]
     }
     sourceSets {
@@ -51,6 +52,10 @@ android {
     }
 }
 
+greendao {
+    schemaVersion 1 //当前数据库版本
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
@@ -67,4 +72,9 @@ dependencies {
     implementation 'cn.jiguang.sdk:jcore:2.2.2'  // 此处以JCore 2.2.2 版本为例。
     // 原生分享
     implementation 'gdut.bsx:share2:0.9.3'
+    // 数据库
+    implementation 'org.greenrobot:greendao:3.2.2' // add library
+    // 轮播图
+    implementation 'com.youth.banner:banner:1.4.10'  //最新版本
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
 }
