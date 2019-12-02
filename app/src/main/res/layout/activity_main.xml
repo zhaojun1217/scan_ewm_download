@@ -8,14 +8,15 @@
 
     <com.youth.banner.Banner
         android:id="@+id/bannerEWM"
+
         android:layout_width="match_parent"
         android:layout_height="240dp" />
 
     <ImageView
         android:id="@+id/imgScanRes"
-        android:layout_below="@+id/bannerEWM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/bannerEWM"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
         android:src="@mipmap/logo" />
@@ -36,8 +37,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/tvLongCheckText"
         android:layout_centerHorizontal="true"
+        android:background="@drawable/shape_btn_bg"
+        android:textColor="@color/bg_color"
         android:layout_marginTop="20dp"
-        android:text="扫描二维码" />
+        android:text="扫易下" />
 
     <Button
         android:id="@+id/btnScanHistory"

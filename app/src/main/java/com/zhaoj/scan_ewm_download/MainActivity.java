@@ -39,6 +39,8 @@ import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 import com.youth.banner.Banner;
+import com.youth.banner.BannerConfig;
+import com.youth.banner.Transformer;
 import com.youth.banner.loader.ImageLoader;
 import com.zhaoj.scan_ewm_download.base.BaseActivity;
 import com.zhaoj.scan_ewm_download.common.Constant;
@@ -246,11 +248,14 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         imgStrs.add("https://b-ssl.duitang.com/uploads/item/201210/06/20121006121229_tPHfy.jpeg");
         imgStrs.add("https://img.52z.com/upload/news/image/20180621/20180621055734_59936.jpg");
         imgStrs.add("https://b-ssl.duitang.com/uploads/blog/201312/04/20131204184148_hhXUT.jpeg");
-
+        //设置banner样式
+//        bannerEWM.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE);
         //设置图片加载器
         bannerEWM.setImageLoader(new GlideImageLoader());
         //设置图片集合
         bannerEWM.setImages(imgStrs);
+        //设置banner动画效果
+        bannerEWM.setBannerAnimation(Transformer.ZoomOutSlide);
         //banner设置方法全部调用完毕时最后调用
         bannerEWM.start();
     }
