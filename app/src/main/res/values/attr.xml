@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="LetToolBar">
+        <attr name="leftButtonIcon" format="reference" /><!--左边按钮-->
+        <attr name="rightButtonIcon" format="reference" /><!--右边按钮-->
+        <attr name="rootViewBgColor" format="reference" /><!--背景色-->
+        <attr name="titleColor" format="color" /><!--标题颜色-->
+        <attr name="myTitleContent" format="string" /><!--标题内容-->
+        <attr name="myRightIconContent" format="string" /><!--右边文字按钮-->
+        <attr name="myLeftTitleContent" format="string" /><!--居中左右切换的 左边标题-->
+        <attr name="myRightTitleContent" format="string" /><!--居中左右切换的 右边标题-->
+        <attr name="toolBarType" format="integer" /><!--toolbar 类型-->
+        <attr name="showRightSingleButton" format="boolean" />
+        <attr name="showRightTwoIcon" format="boolean" />
+        <attr name="rightButtonImage" format="reference" />
+        <attr name="fixActionBar" format="boolean" />
+        <attr name="rightButtonText" format="string" />
+        <attr name="centerTitleText" format="string" />
+        <attr name="showLeftIcon" format="boolean" />
+        <attr name="showSaveAndDelete" format="boolean" />
+    </declare-styleable>
+
+</resources>

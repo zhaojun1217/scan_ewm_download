@@ -2,7 +2,6 @@ package com.zhaoj.scan_ewm_download;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -23,6 +22,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +39,6 @@ import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.uuzuche.lib_zxing.activity.ZXingLibrary;
 import com.youth.banner.Banner;
-import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
 import com.youth.banner.loader.ImageLoader;
 import com.zhaoj.scan_ewm_download.base.BaseActivity;
@@ -48,6 +47,8 @@ import com.zhaoj.scan_ewm_download.dialog.DialogUtil;
 import com.zhaoj.scan_ewm_download.download.DownLoadUtil;
 import com.zhaoj.scan_ewm_download.utils.BitmapHandleUtil;
 import com.zhaoj.scan_ewm_download.utils.CreateBarcodeUtil;
+import com.zhaoj.scan_ewm_download.utils.ScreenUtil;
+import com.zhaoj.scan_ewm_download.utils.ToastUtil;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -66,12 +67,12 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
 
     private int REQUEST_CODE = 2333;
     private static final int RERMISSION_REQUESTCODE = 1;
-    private Button btnScan, btnScanHistory;
+    private Button btnScan, btnSave, btnAppInfo;
     private ImageView imgScanRes;
-    private TextView tvLongCheckText;
+    private TextView tvShareText;
     private Banner bannerEWM;
     private File fileByBitmap;
-
+    private LinearLayout llStateBar;
 
     protected String[] needPermission = {android.Manifest.permission.CAMERA, android.Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private ArrayList<String> imgStrs = new ArrayList<>();
@@ -114,7 +115,6 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         return R.layout.activity_main;
     }
 
-
     @Override
     protected void initPage() {
         super.initPage();
@@ -123,6 +123,9 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
         JPushInterface.setDebugMode(true);    // 设置开启日志,发布时请关闭日志
         JPushInterface.init(this);   // 初始化 JPush
         boolean enabled = isNotificationEnabled(MainActivity.this);
+
+        // 适配状态栏高度
+        ScreenUtil.setSelfToolbar(mContext, llStateBar, 0);
 
         if (!enabled) {
             /**
@@ -175,22 +178,37 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
             }
         });
 
-        tvLongCheckText.setOnClickListener(new View.OnClickListener() {
+        /**
+         * 点击分享图片
+         */
+        tvShareText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Share2.Builder(MainActivity.this)
-                        .setContentType(ShareContentType.IMAGE)
-                        .setShareFileUri(getShareImageUrl())
-                        .setTitle("分享")
-                        .build()
-                        .shareBySystem();
+                if (getShareUrl() == null) {
+                    new Share2.Builder(mContext)
+                            .setContentType(ShareContentType.TEXT)
+                            .setTextContent("https://www.pgyer.com/LAca")
+                            .setTitle("扫易下app下载链接")
+                            .build()
+                            .shareBySystem();
+                } else {
+                    new Share2.Builder(mContext)
+                            .setContentType(ShareContentType.IMAGE)
+                            .setShareFileUri(getShareUrl())
+                            .setTitle("分享二维码")
+                            .build()
+                            .shareBySystem();
+                }
             }
         });
 
+        /**
+         * 长按识别图中二维码
+         */
         imgScanRes.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-
+                // 效果不错，不仅可以识别二维码图片，还可以识别整个大图中包含的小二维码图片
                 Bitmap obmp = ((BitmapDrawable) (imgScanRes).getDrawable()).getBitmap();
                 int width = obmp.getWidth();
                 int height = obmp.getHeight();
@@ -211,33 +229,53 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
                 }
 
                 // 检测到下载地址为xxx，是否下载
-                DialogUtil.showCustomCommonDialog(MainActivity.this, "检测到下载地址,是否下载？", re.getText());
+                if (re != null) {
+                    DialogUtil.showCustomCommonDialog(MainActivity.this, "检测到下载地址,是否下载？", re.getText());
+                } else {
+                    ToastUtil.showShort(mContext, "无法识别的二维码！");
+                }
                 return false;
 
             }
         });
 
-        btnScanHistory.setOnClickListener(new View.OnClickListener() {
+        /**
+         * 收藏功能 ，保存当前图片地址到本地数据库
+         */
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, ScanHistoryActivity.class));
+
+            }
+        });
+
+        /**
+         * 关于
+         */
+        btnAppInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(mContext, AppInfoActivity.class));
             }
         });
     }
 
-
-    private Uri getShareImageUrl() {
-        return FileUtil.getFileUri(MainActivity.this, ShareContentType.IMAGE, fileByBitmap);
+    private Uri getShareUrl() {
+        Uri fileUri = FileUtil.getFileUri(mContext, ShareContentType.IMAGE, fileByBitmap);
+        Uri defaultUri = Uri.parse("https://www.pgyer.com/LAca"); // 下载扫一下app的地址 https://www.pgyer.com/LAca 二维码：file:///android_asset/app_download_ewm.png
+        return fileUri;
     }
 
     @Override
     protected void initView() {
         super.initView();
         btnScan = findViewById(R.id.btnScan);
+        btnSave = findViewById(R.id.btnSave);
+        llStateBar = findViewById(R.id.llStateBar);
+        btnAppInfo = findViewById(R.id.btnAppInfo);
         bannerEWM = findViewById(R.id.bannerEWM);
         imgScanRes = findViewById(R.id.imgScanRes);
-        btnScanHistory = findViewById(R.id.btnScanHistory);
-        tvLongCheckText = findViewById(R.id.tvLongCheckText);
+        tvShareText = findViewById(R.id.tvShareText);
 
         initBanner();
     }
@@ -245,9 +283,9 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     private void initBanner() {
 
         imgStrs.add("https://b-ssl.duitang.com/uploads/item/201208/30/20120830173930_PBfJE.jpeg");
-        imgStrs.add("https://b-ssl.duitang.com/uploads/item/201210/06/20121006121229_tPHfy.jpeg");
+        imgStrs.add("http://file02.16sucai.com/d/file/2014/0829/372edfeb74c3119b666237bd4af92be5.jpg");
         imgStrs.add("https://img.52z.com/upload/news/image/20180621/20180621055734_59936.jpg");
-        imgStrs.add("https://b-ssl.duitang.com/uploads/blog/201312/04/20131204184148_hhXUT.jpeg");
+        imgStrs.add("http://img5.imgtn.bdimg.com/it/u=3008142408,2229729459&fm=26&gp=0.jpg");
         //设置banner样式
 //        bannerEWM.setBannerStyle(BannerConfig.CIRCLE_INDICATOR_TITLE);
         //设置图片加载器
@@ -318,7 +356,7 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
                         Bitmap scanResBitmap = CreateBarcodeUtil.createImage(result, 500, 500, BitmapFactory.decodeResource(getResources(), R.mipmap.logo));
                         imgScanRes.setImageBitmap(scanResBitmap);
                         fileByBitmap = BitmapHandleUtil.createFileByBitmap(scanResBitmap, Constant.DIRPATH);
-                        tvLongCheckText.setVisibility(View.VISIBLE);
+                        tvShareText.setVisibility(View.VISIBLE);
                         // 检测到下载地址为xxx，是否下载
                         DialogUtil.showCustomCommonDialog(MainActivity.this, "检测到下载地址,是否下载？", result);
                     }
@@ -359,19 +397,9 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
     public class GlideImageLoader extends ImageLoader {
         @Override
         public void displayImage(Context context, Object path, ImageView imageView) {
-            /**
-             注意：
-             1.图片加载器由自己选择，这里不限制，只是提供几种使用方法
-             2.返回的图片路径为Object类型，由于不能确定你到底使用的那种图片加载器，
-             传输的到的是什么格式，那么这种就使用Object接收和返回，你只需要强转成你传输的类型就行，
-             切记不要胡乱强转！
-             */
 
             //Glide 加载图片简单用法
             Glide.with(context).load(path).into(imageView);
-
-//            //Picasso 加载图片简单用法
-//            Picasso.with(context).load(path).into(imageView);
 
             //用fresco加载图片简单用法，记得要写下面的createImageView方法
             Uri uri = Uri.parse((String) path);

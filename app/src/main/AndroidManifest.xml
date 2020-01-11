@@ -71,6 +71,7 @@
 
         <activity android:name=".jpush.TestActivity"/>
         <activity android:name=".ScanHistoryActivity"/>
+        <activity android:name=".AppInfoActivity"/>
 
         <receiver android:name=".download.InstallApkBroadcast">
             <intent-filter>

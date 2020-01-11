@@ -4,52 +4,91 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/app_bg"
     tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/llStateBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
     <com.youth.banner.Banner
         android:id="@+id/bannerEWM"
-
         android:layout_width="match_parent"
-        android:layout_height="240dp" />
+        android:layout_height="240dp"
+        android:layout_below="@+id/llStateBar" />
 
     <ImageView
         android:id="@+id/imgScanRes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="166dp"
+        android:layout_height="166dp"
         android:layout_below="@+id/bannerEWM"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:src="@mipmap/logo" />
+        android:layout_marginTop="10dp"
+        android:src="@mipmap/app_download_ewm" />
 
     <TextView
-        android:id="@+id/tvLongCheckText"
+        android:id="@+id/tvShareText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imgScanRes"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:text="点击分享给好友"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <Button
         android:id="@+id/btnScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvLongCheckText"
+        android:layout_below="@+id/tvShareText"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/shape_btn_bg"
-        android:textColor="@color/bg_color"
         android:layout_marginTop="20dp"
-        android:text="扫易下" />
+        android:background="@drawable/shape_btn_bg"
+        android:text="扫易下"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnScanHistory"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/btnScan"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="历史扫描记录"
-        android:visibility="gone" />
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/shape_btn_bg"
+            android:text="收藏"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnAppInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/shape_btn_bg"
+            android:text="关于"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:text="声明： 二维码一定是可以直接下载的，跳转链接无法识别"
+        android:textSize="10dp" />
 
 </RelativeLayout>
